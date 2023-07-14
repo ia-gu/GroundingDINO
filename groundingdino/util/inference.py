@@ -1,5 +1,7 @@
 from typing import Tuple, List
 
+import re
+import os
 import cv2
 import numpy as np
 import supervision as sv
@@ -99,10 +101,12 @@ def predict(
 
 def annotate(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tensor, phrases: List[str]) -> np.ndarray:
     h, w, _ = image_source.shape
+    # tensor([[453.0166, 449.5554, 808.3561, 811.5031]])
     boxes = boxes * torch.Tensor([w, h, w, h])
+    # array([[ 48.838562,  43.803833, 857.1947  , 855.30695 ]], dtype=float32)
     xyxy = box_convert(boxes=boxes, in_fmt="cxcywh", out_fmt="xyxy").numpy()
     detections = sv.Detections(xyxy=xyxy)
-
+    # ['anomaly 0.72']
     labels = [
         f"{phrase} {logit:.2f}"
         for phrase, logit
@@ -112,8 +116,34 @@ def annotate(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tensor
     box_annotator = sv.BoxAnnotator()
     annotated_frame = cv2.cvtColor(image_source, cv2.COLOR_RGB2BGR)
     annotated_frame = box_annotator.annotate(scene=annotated_frame, detections=detections, labels=labels)
+    cv2.imwrite('result.png', annotated_frame)
+    import pdb
+    pdb.set_trace()
     return annotated_frame
 
+def annotatev2(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tensor, phrases: List[str], data_path: str, text: str) -> np.ndarray:
+    h, w, _ = image_source.shape
+    # tensor([[453.0166, 449.5554, 808.3561, 811.5031]])
+    boxes = boxes * torch.Tensor([w, h, w, h])
+    # array([[ 48.838562,  43.803833, 857.1947  , 855.30695 ]], dtype=float32)
+    xyxy = box_convert(boxes=boxes, in_fmt="cxcywh", out_fmt="xyxy").numpy()
+    detections = sv.Detections(xyxy=xyxy)
+    # ['anomaly 0.72']
+    labels = [
+        f"{phrase} {logit:.2f}"
+        for phrase, logit
+        in zip(phrases, logits)
+    ]
+
+    box_annotator = sv.BoxAnnotator()
+    annotated_frame = cv2.cvtColor(image_source, cv2.COLOR_RGB2BGR)
+    annotated_frame = box_annotator.annotate(scene=annotated_frame, detections=detections, labels=labels)
+    
+    match = re.match(r'/data/dataset/mvtec/(.*?)/test/(.*?)/(\d+.png)', data_path)
+    category, defect_type, filename = match.groups()
+    os.makedirs(os.path.join('result', category, defect_type, text), exist_ok=True)
+    result_path = os.path.join('result', category, defect_type, text, filename)
+    cv2.imwrite(result_path, annotated_frame)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # NEW API
