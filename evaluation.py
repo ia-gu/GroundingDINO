@@ -1,6 +1,7 @@
+import re
 import os
 import glob
-import supervision as sv
+import json
 from PIL import Image
 import numpy as np
 import cv2
@@ -42,31 +43,29 @@ def main():
             box_threshold=BOX_TRESHOLD, 
             text_threshold=TEXT_TRESHOLD)
 
-            # boxes = [xmin, ymin, 横幅, 縦幅]
             annotatev2(image_source=image_source, boxes=boxes, logits=logits, phrases=phrases, data_path=data_path, text=text)
 
             gt = ground_truth[idx]
-            # IoU
-            iou = 0
+            iou = []
             gt = list(map(float, gt.split(',')))
             for box in boxes:
                 box = box_convert(boxes=box, in_fmt="cxcywh", out_fmt="xyxy").tolist()
                 box = [b*1024 for b in box]
-                iou += calculate_iou(box, list(map(float, gt)))
-                import pdb
-                pdb.set_trace()
-            try:
-                iou /= len(boxes)
-                
-                with open('dino_result.csv', 'a') as f:
-                    writer = csv.writer(f)
-                    writer.writerow([iou])
-            except:
-                with open('dino_result.csv', 'a') as f:
-                    writer = csv.writer(f)
-                    writer.writerow(['None'])
-                
-        idx += 1
+                iou.append(calculate_iou(box, list(map(float, gt))))
             
+            match = re.match(r'/data/dataset/mvtec/(.*?)/test/(.*?)/(\d+.png)', data_path)
+            category, defect, file = match.groups()
+            if category not in result_dict:
+                result_dict[category] = {}
+            if defect not in result_dict[category]:
+                result_dict[category][defect] = {}
+            if text not in result_dict[category][defect]:
+                result_dict[category][defect][text] = {}
+            result_dict[category][defect][text][file] = iou
+        
+        idx += 1
+    with open('result.json', 'w') as f:
+        json.dump(result_dict, f, indent=4)
+
 if __name__ == '__main__':
     main()
