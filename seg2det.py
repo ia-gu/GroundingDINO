@@ -61,4 +61,4 @@ for mask_path, image_path in zip(segmentation_mask_paths, image_paths):
         writer = csv.writer(f, lineterminator="\n")
         for x, y, w, h in bounding_boxes:
             bb.append([x, y, x+w, y+h])
-        writer.writerow(bb)
+        writer.writerows(bb)
