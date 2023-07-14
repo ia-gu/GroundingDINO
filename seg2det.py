@@ -7,9 +7,11 @@ import numpy as np
 
 # セグメンテーションマスクのパス一覧を取得
 segmentation_mask_paths = glob.glob('/data/dataset/mvtec/*/ground_truth/*/*.png')
-segmentation_mask_paths = [file_path for file_path in segmentation_mask_paths if "/good/" not in file_path]
+segmentation_mask_paths = sorted([file_path for file_path in segmentation_mask_paths if "/good/" not in file_path])
 image_paths = glob.glob('/data/dataset/mvtec/*/test/*/*.png')
-image_paths = [file_path for file_path in image_paths if "/good/" not in file_path]
+image_paths = sorted([file_path for file_path in image_paths if "/good/" not in file_path])
+with open('bbox.csv') as f:
+    pass
 
 for mask_path, image_path in zip(segmentation_mask_paths, image_paths):
     if not len(segmentation_mask_paths) == len(image_paths):

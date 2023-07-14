@@ -23,11 +23,12 @@ with open('bbox_old.csv', 'r') as f:
     ground_truth = f.read().split('\n')
 with open('dino_result.csv', 'w') as f:
     pass
+result_dict = {}
 
 def main():
     idx = 0
     test_data_path_list = glob.glob("/data/dataset/mvtec/*/test/*/*.png")
-    test_data_path_list = [file_path for file_path in test_data_path_list if "/good/" not in file_path]
+    test_data_path_list = sorted([file_path for file_path in test_data_path_list if "/good/" not in file_path])
     
     for data_path in tqdm(test_data_path_list):
         TEXT_PROMPTS[-1] = data_path.split('/')[6]
@@ -40,22 +41,20 @@ def main():
             caption=text, 
             box_threshold=BOX_TRESHOLD, 
             text_threshold=TEXT_TRESHOLD)
-            # show_result(data_path, boxes)
-            # import pdb
-            # pdb.set_trace()
+
             # boxes = [xmin, ymin, 横幅, 縦幅]
             annotatev2(image_source=image_source, boxes=boxes, logits=logits, phrases=phrases, data_path=data_path, text=text)
-            # sv.plot_image(annotated_frame, (8, 8))
 
             gt = ground_truth[idx]
-            # mAP
-
             # IoU
             iou = 0
             gt = list(map(float, gt.split(',')))
             for box in boxes:
                 box = box_convert(boxes=box, in_fmt="cxcywh", out_fmt="xyxy").tolist()
+                box = [b*1024 for b in box]
                 iou += calculate_iou(box, list(map(float, gt)))
+                import pdb
+                pdb.set_trace()
             try:
                 iou /= len(boxes)
                 
@@ -67,7 +66,7 @@ def main():
                     writer = csv.writer(f)
                     writer.writerow(['None'])
                 
-            idx += 1
+        idx += 1
             
 if __name__ == '__main__':
     main()
