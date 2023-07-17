@@ -139,7 +139,7 @@ def annotatev2(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tens
     annotated_frame = cv2.cvtColor(image_source, cv2.COLOR_RGB2BGR)
     annotated_frame = box_annotator.annotate(scene=annotated_frame, detections=detections, labels=labels)
     
-    match = re.match(r'/data/dataset/mvtec/(.*?)/test/(.*?)/(\d+.png)', data_path)
+    match = re.match(r'/home/data/mvtec/(.*?)/test/(.*?)/(\d+.png)', data_path)
     category, defect_type, filename = match.groups()
     os.makedirs(os.path.join('result', category, defect_type, text), exist_ok=True)
     result_path = os.path.join('result', category, defect_type, text, filename)

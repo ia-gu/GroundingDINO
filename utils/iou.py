@@ -1,3 +1,27 @@
+def calculate_max_iou_per_prediction(boxes1, boxes2):
+    """Calculate the maximum IoU for each prediction box with respect to all ground truth boxes.
+
+    Arguments:
+    boxes1, boxes2 -- lists of bounding boxes; each box is a list of [xmin, ymin, xmax, ymax]
+
+    Returns:
+    max_ious -- list of tuples; each tuple contains the maximum IoU for a prediction and the index of the GT box that achieved it
+    """
+    max_ious = []
+    for i, box1 in enumerate(boxes1):
+        ious = []
+        for box2 in boxes2:
+            iou = calculate_iou(box1, box2)
+            ious.append(iou)
+        max_iou = max(ious)
+        # max_iou_index = ious.index(max_iou)
+        # max_ious.append((max_iou, max_iou_index))
+        max_ious.append(max_iou)
+    try:
+        return max(max_ious)
+    except:
+        return [0]
+
 def calculate_iou(box1, box2):
     """Calculate intersection over union (IoU) of two bounding boxes.
 

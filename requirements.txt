@@ -6,5 +6,7 @@ yapf
 timm
 numpy
 opencv-python
+pandas
+statistics
 # supervision==0.6.0
 # pycocotools
