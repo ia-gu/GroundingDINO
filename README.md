@@ -17,6 +17,12 @@ wget -q https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-
 ```
 python seg2det.py
 ```
-→evaluation.pyで性能検証
+→bbox.jsonにGTのBBが，vtec/*/bounding_boxes/下に画像が保存される
 
-predict()を別のモデルに変えれば他も検証可能（PROのためにBBの形は揃える）
+性能検証
+```
+evaluation.py
+```
+→result.jsonに各画像のIoUが，result/下に予測画像が保存される
+
+※predict()を別のモデルに変えれば他も検証可能

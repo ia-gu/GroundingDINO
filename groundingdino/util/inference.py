@@ -141,8 +141,8 @@ def annotatev2(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tens
     
     match = re.match(r'/home/data/mvtec/(.*?)/test/(.*?)/(\d+.png)', data_path)
     category, defect_type, filename = match.groups()
-    os.makedirs(os.path.join('result', category, defect_type, text), exist_ok=True)
-    result_path = os.path.join('result', category, defect_type, text, filename)
+    os.makedirs(os.path.join('result_ad', category, defect_type, text), exist_ok=True)
+    result_path = os.path.join('result_ad', category, defect_type, text, filename)
     cv2.imwrite(result_path, annotated_frame)
 
 # ----------------------------------------------------------------------------------------------------------------------
